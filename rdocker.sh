@@ -117,6 +117,11 @@ exec 3<>$PIPE; rm $PIPE
 # find a free port or use the provided one
 local_port=${local_port:-$(python -c "$find_port_code")}
 
+if [ -z $local_port ]; then
+    echo "FAILED TO ALLOCATE LOCAL PORT... Verify if you have python installed"
+    exit 1
+fi
+
 remote_script_path="/tmp/rdocker-forwarder.py"
 printf "$forwarder" | ssh $remote_host -o ControlPath=$control_path -L $local_port:localhost:$remote_port "cat > ${remote_script_path}; exec python -u ${remote_script_path}" 1>&3 &
 CONNECTION_PID=$!
